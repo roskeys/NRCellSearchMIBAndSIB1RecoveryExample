@@ -4,12 +4,12 @@ refBurst.BlockPattern = 'Case A';
 refBurst.L_max = 4;
 minChannelBW = 5;
 
-samples_file = "/home/roskey/Documents/MATLAB/NRCellSearchMIBAndSIB1RecoveryExample/records/srsran_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn1.fc32";
+samples_file = "/home/roskey/Documents/MATLAB/NRCellSearchMIBAndSIB1RecoveryExample/records/srsran_band1_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn.fc32";
 fid = fopen(samples_file, 'rb');
 if fid == -1
     fprintf("Failed to open file!\n"); 
 end
-skip = readIQSamplesFromFile(fid, 23.04e4 * 14.3);
+skip = readIQSamplesFromFile(fid, 23.04e4 * 10.6);
 rxWaveform = readIQSamplesFromFile(fid, 23.04e4);
 
 % Get OFDM information from configured burst and receiver parameters
@@ -21,7 +21,8 @@ rxOfdmInfo = nrOFDMInfo(nrbSSB,scsSSB,'SampleRate',sampleRate);
 % figure;
 % nfft = rxOfdmInfo.Nfft;
 % spectrogram(rxWaveform(:,1),ones(nfft,1),0,nfft,'centered',sampleRate,'yaxis','MinThreshold',-130);
-% title('Spectrogram of the Received Waveform')
+% title('Spectrogram of the Received Waveform');
+
 %% PSS Search and Frequency Offset Correction
 % The receiver performs PSS search and coarse frequency offset estimation
 % following these steps:
@@ -381,7 +382,7 @@ monSlotsSym = 295:322;
 monSlotsSym = monSlotsSym - 14;
 % Extract slots containing strongest PDCCH from the received grid
 rxMonSlotGrid = rxGrid(csetSubcarriers,monSlotsSym,:);
-imagesc(abs(rxMonSlotGrid(:,:,1)));
+% imagesc(abs(rxMonSlotGrid(:,:,1)));
 %%
 % Configure CORESET, search space, and other PDCCH parameters. CORESET
 % resources and search spaces are configured according to TS 38.213 Section
@@ -412,8 +413,7 @@ symbolsPerSlot = 14;
 tcRNTI = 0x4601; % TS 38.321 Table 7.1-1
 dciCRC = true;
 mSlotIdx = 0;
-pdcch.SearchSpace.NumCandidates = [1 1 1 1 0];
-disp(pdcch);
+pdcch.SearchSpace.NumCandidates = [0 0 1 0 0];
 % Loop over all monitoring slots
 while (mSlotIdx < length(monSlots)) && dciCRC
 
@@ -423,8 +423,6 @@ while (mSlotIdx < length(monSlots)) && dciCRC
     % Get PDCCH candidates according to TS 38.213 Section 10.1
     [pdcchInd,pdcchDmrsSym,pdcchDmrsInd] = nrPDCCHSpace(carrier,pdcch);
     % Extract resource grid for this monitoring slot and normalize
-    disp("rxSlotGrid");
-    disp((1:symbolsPerSlot) + symbolsPerSlot*mSlotIdx);
     rxSlotGrid = rxMonSlotGrid(:,(1:symbolsPerSlot) + symbolsPerSlot*mSlotIdx,:);
     rxSlotGrid = rxSlotGrid/max(abs(rxSlotGrid(:))); 
     % Proceed to blind decoding only if the PDCCH REs are not zero.
@@ -495,7 +493,6 @@ disp([' PDCCH CRC: ' num2str(dciCRC)]);
 
 % Build DCI message structure
 dci = fromBits(dci,dcibits);
-disp(dci);
 % Get PDSCH configuration from cell ID, BCH information, and DCI
 [pdsch,K0] = hSIB1PDSCHConfiguration(dci,pdcch.NSizeBWP,initialSystemInfo.DMRSTypeAPosition,csetPattern);
 
@@ -634,8 +631,6 @@ end
 % # 3GPP TS 38.321. "NR; Medium Access Control (MAC) protocol
 % specification." _3rd Generation Partnership Project; Technical
 % Specification Group Radio Access Network_.
-
-%% Local functions
 
 %% Local functions
 function hex = arrayToHex(array)

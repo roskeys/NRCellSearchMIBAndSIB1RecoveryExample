@@ -1,4 +1,5 @@
-samples_file = "records/srsran_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn1.fc32";
+% samples_file = "records/srsran_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn1.fc32";
+samples_file = "/home/roskey/Documents/MATLAB/NRCellSearchMIBAndSIB1RecoveryExample/records/srsran_band1_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn.fc32";
 sampleRate = 23040000; % Hz
 frameSize = sampleRate * 10e-3;
 

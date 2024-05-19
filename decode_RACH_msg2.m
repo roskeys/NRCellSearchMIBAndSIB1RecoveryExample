@@ -4,14 +4,13 @@ refBurst.BlockPattern = 'Case A';
 refBurst.L_max = 4;
 minChannelBW = 5;
 
-samples_file = "/home/roskey/Documents/MATLAB/NRCellSearchMIBAndSIB1RecoveryExample/records/srsran_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn1.fc32";
+samples_file = "/home/roskey/Documents/MATLAB/NRCellSearchMIBAndSIB1RecoveryExample/records/srsran_band1_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn.fc32";
 fid = fopen(samples_file, 'rb');
 if fid == -1
     fprintf("Failed to open file!\n"); 
 end
-skip = readIQSamplesFromFile(fid, 23.04e4 * 12.3);
+skip = readIQSamplesFromFile(fid, 23.04e4 * 8.6);
 rxWaveform = readIQSamplesFromFile(fid, 23.04e4);
-
 % Get OFDM information from configured burst and receiver parameters
 nrbSSB = 20;
 scsSSB = hSSBurstSubcarrierSpacing(refBurst.BlockPattern);
@@ -21,7 +20,7 @@ rxOfdmInfo = nrOFDMInfo(nrbSSB,scsSSB,'SampleRate',sampleRate);
 % figure;
 % nfft = rxOfdmInfo.Nfft;
 % spectrogram(rxWaveform(:,1),ones(nfft,1),0,nfft,'centered',sampleRate,'yaxis','MinThreshold',-130);
-% title('Spectrogram of the Received Waveform')
+% title('Spectrogram of the Received Waveform');
 %% PSS Search and Frequency Offset Correction
 % The receiver performs PSS search and coarse frequency offset estimation
 % following these steps:
