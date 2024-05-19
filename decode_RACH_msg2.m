@@ -4,7 +4,7 @@ refBurst.BlockPattern = 'Case A';
 refBurst.L_max = 4;
 minChannelBW = 5;
 
-samples_file = "records/srsran_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn1.fc32";
+samples_file = "/home/roskey/Documents/MATLAB/NRCellSearchMIBAndSIB1RecoveryExample/records/srsran_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn1.fc32";
 fid = fopen(samples_file, 'rb');
 if fid == -1
     fprintf("Failed to open file!\n"); 
@@ -381,7 +381,6 @@ end
 monSlotsSym = 379:393;
 % Extract slots containing strongest PDCCH from the received grid
 rxMonSlotGrid = rxGrid(csetSubcarriers,monSlotsSym,:);
-imagesc(abs(rxMonSlotGrid(:,:,1))); axis xy; hold on;
 
 %%
 % Configure CORESET, search space, and other PDCCH parameters. CORESET
@@ -503,7 +502,7 @@ dci = fromBits(dci,dcibits);
 % information, see TS 38.214 Table 5.1.2.1.1-4.
 carrier.NSlot = carrier.NSlot + K0;
 monSlotsSym = monSlotsSym+symbolsPerSlot*K0;
-
+pdsch.RNTI = raRNTI;
 if K0 > 0    
     % Display the OFDM grid of the slot containing associated PDSCH
     figure;
@@ -572,10 +571,11 @@ for fpc = fPhaseComp + 1e3*freqSearch
     decodeDLSCH.TargetCodeRate = tcr;
     
     % Decode DL-SCH
-    [sib1bits,sib1CRC] = decodeDLSCH(cw,pdsch.Modulation,pdsch.NumLayers,dci.RedundancyVersion);
+    [databits,dataCRC] = decodeDLSCH(cw,pdsch.Modulation,pdsch.NumLayers,dci.RedundancyVersion);
     
-    if sib1CRC == 0
-        arrayToHex(sib1bits);
+    if dataCRC == 0
+        disp('PDSCH data: ');
+        arrayToHex(databits);
         break;
     end
     
@@ -584,7 +584,7 @@ end
 % Highlight PDSCH and PDSCH DM-RS in resource grid.
 pdcch.AggregationLevel = 2^(aLevIdx-2); 
 pdcch.AllocatedCandidate = cIdx-1;
-plotResourceGridSIB1(rxSlotGrid,carrier,pdcch,pdsch,tcr,K0);
+% plotResourceGridSIB1(rxSlotGrid,carrier,pdcch,pdsch,tcr,K0);
     
 % Plot received PDSCH constellation after equalization
 figure;
@@ -605,9 +605,9 @@ disp([' PDSCH RMS EVM: ' num2str(pdschEVMrms,'%0.3f') '%']);
 disp([' PDSCH CRC: ' num2str(sib1CRC)]);
 
 if sib1CRC == 0
-    disp(' SIB1 decoding succeeded.');
+    disp(' PDSCH decoding succeeded.');
 else
-    disp(' SIB1 decoding failed.');
+    disp(' PDSCH decoding failed.');
 end
 
 %% References
