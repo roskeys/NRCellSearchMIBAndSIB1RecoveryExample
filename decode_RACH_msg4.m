@@ -11,7 +11,6 @@ if fid == -1
 end
 skip = readIQSamplesFromFile(fid, 23.04e4 * 10.6);
 rxWaveform = readIQSamplesFromFile(fid, 23.04e4);
-
 % Get OFDM information from configured burst and receiver parameters
 nrbSSB = 20;
 scsSSB = hSSBurstSubcarrierSpacing(refBurst.BlockPattern);
@@ -22,7 +21,6 @@ rxOfdmInfo = nrOFDMInfo(nrbSSB,scsSSB,'SampleRate',sampleRate);
 % nfft = rxOfdmInfo.Nfft;
 % spectrogram(rxWaveform(:,1),ones(nfft,1),0,nfft,'centered',sampleRate,'yaxis','MinThreshold',-130);
 % title('Spectrogram of the Received Waveform');
-
 %% PSS Search and Frequency Offset Correction
 % The receiver performs PSS search and coarse frequency offset estimation
 % following these steps:
@@ -378,11 +376,10 @@ if isempty(monSlotsSym)
     return;
 end
 
-monSlotsSym = 295:322;
-monSlotsSym = monSlotsSym - 14;
+monSlotsSym = 281:308;
 % Extract slots containing strongest PDCCH from the received grid
 rxMonSlotGrid = rxGrid(csetSubcarriers,monSlotsSym,:);
-% imagesc(abs(rxMonSlotGrid(:,:,1)));
+imagesc(abs(rxMonSlotGrid(:,:,1))); axis xy
 %%
 % Configure CORESET, search space, and other PDCCH parameters. CORESET
 % resources and search spaces are configured according to TS 38.213 Section
@@ -493,6 +490,7 @@ disp([' PDCCH CRC: ' num2str(dciCRC)]);
 
 % Build DCI message structure
 dci = fromBits(dci,dcibits);
+
 % Get PDSCH configuration from cell ID, BCH information, and DCI
 [pdsch,K0] = hSIB1PDSCHConfiguration(dci,pdcch.NSizeBWP,initialSystemInfo.DMRSTypeAPosition,csetPattern);
 
@@ -631,6 +629,8 @@ end
 % # 3GPP TS 38.321. "NR; Medium Access Control (MAC) protocol
 % specification." _3rd Generation Partnership Project; Technical
 % Specification Group Radio Access Network_.
+
+%% Local functions
 
 %% Local functions
 function hex = arrayToHex(array)
