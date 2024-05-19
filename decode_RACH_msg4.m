@@ -9,7 +9,7 @@ fid = fopen(samples_file, 'rb');
 if fid == -1
     fprintf("Failed to open file!\n"); 
 end
-skip = readIQSamplesFromFile(fid, 23.04e4 * 12.3);
+skip = readIQSamplesFromFile(fid, 23.04e4 * 14.3);
 rxWaveform = readIQSamplesFromFile(fid, 23.04e4);
 
 % Get OFDM information from configured burst and receiver parameters
@@ -377,10 +377,11 @@ if isempty(monSlotsSym)
     return;
 end
 
-monSlotsSym = 379:393;
+monSlotsSym = 295:322;
+monSlotsSym = monSlotsSym - 14;
 % Extract slots containing strongest PDCCH from the received grid
 rxMonSlotGrid = rxGrid(csetSubcarriers,monSlotsSym,:);
-imagesc(abs(rxMonSlotGrid(:,:,1))); axis xy
+imagesc(abs(rxMonSlotGrid(:,:,1)));
 %%
 % Configure CORESET, search space, and other PDCCH parameters. CORESET
 % resources and search spaces are configured according to TS 38.213 Section
@@ -403,15 +404,16 @@ carrier = hCarrierConfigSIB1(ncellid,initialSystemInfo,pdcch);
 
 % Specify DCI message with Format 1_0 scrambled with SI-RNTI (TS 38.212
 % Section 7.3.1.2.1)
-dci = DCIFormat1_0_SIRNTI(pdcch.NSizeBWP);
+dci = DCIFormat1_0_TCRNTI(pdcch.NSizeBWP);
 
 disp(' -- Downlink control information message search in PDCCH -- ');
 
 symbolsPerSlot = 14;
-raRNTI = 0xf; % TS 38.321 Table 7.1-1
+tcRNTI = 0x4601; % TS 38.321 Table 7.1-1
 dciCRC = true;
 mSlotIdx = 0;
-pdcch.SearchSpace.NumCandidates = [0 0 1 0 0];
+pdcch.SearchSpace.NumCandidates = [1 1 1 1 0];
+disp(pdcch);
 % Loop over all monitoring slots
 while (mSlotIdx < length(monSlots)) && dciCRC
 
@@ -420,8 +422,9 @@ while (mSlotIdx < length(monSlots)) && dciCRC
     
     % Get PDCCH candidates according to TS 38.213 Section 10.1
     [pdcchInd,pdcchDmrsSym,pdcchDmrsInd] = nrPDCCHSpace(carrier,pdcch);
-
     % Extract resource grid for this monitoring slot and normalize
+    disp("rxSlotGrid");
+    disp((1:symbolsPerSlot) + symbolsPerSlot*mSlotIdx);
     rxSlotGrid = rxMonSlotGrid(:,(1:symbolsPerSlot) + symbolsPerSlot*mSlotIdx,:);
     rxSlotGrid = rxSlotGrid/max(abs(rxSlotGrid(:))); 
     % Proceed to blind decoding only if the PDCCH REs are not zero.
@@ -444,7 +447,7 @@ while (mSlotIdx < length(monSlots)) && dciCRC
 
             % DCI message decoding
             polarListLength = 8;
-            [dcibits,dciCRC] = nrDCIDecode(dcicw,dci.Width,polarListLength,raRNTI);
+            [dcibits,dciCRC] = nrDCIDecode(dcicw,dci.Width,polarListLength,tcRNTI);
 
             if dciCRC == 0
                 disp([' Decoded PDCCH candidate #' num2str(cIdx) ' at aggregation level ' num2str(2^(aLevIdx-1))])
@@ -492,7 +495,7 @@ disp([' PDCCH CRC: ' num2str(dciCRC)]);
 
 % Build DCI message structure
 dci = fromBits(dci,dcibits);
-
+disp(dci);
 % Get PDSCH configuration from cell ID, BCH information, and DCI
 [pdsch,K0] = hSIB1PDSCHConfiguration(dci,pdcch.NSizeBWP,initialSystemInfo.DMRSTypeAPosition,csetPattern);
 
@@ -501,7 +504,7 @@ dci = fromBits(dci,dcibits);
 % information, see TS 38.214 Table 5.1.2.1.1-4.
 carrier.NSlot = carrier.NSlot + K0;
 monSlotsSym = monSlotsSym+symbolsPerSlot*K0;
-pdsch.RNTI = raRNTI;
+pdsch.RNTI = tcRNTI;
 if K0 > 0    
     % Display the OFDM grid of the slot containing associated PDSCH
     figure;
