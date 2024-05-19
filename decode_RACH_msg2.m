@@ -381,7 +381,7 @@ end
 monSlotsSym = 379:393;
 % Extract slots containing strongest PDCCH from the received grid
 rxMonSlotGrid = rxGrid(csetSubcarriers,monSlotsSym,:);
-
+imagesc(abs(rxMonSlotGrid(:,:,1))); axis xy
 %%
 % Configure CORESET, search space, and other PDCCH parameters. CORESET
 % resources and search spaces are configured according to TS 38.213 Section
@@ -602,9 +602,9 @@ pdschEVMrms = evm(pdschRef,pdschEqSym/sqrt(var(pdschEqSym)));
 
 % Display PDSCH EVM and DL-SCH CRC
 disp([' PDSCH RMS EVM: ' num2str(pdschEVMrms,'%0.3f') '%']);
-disp([' PDSCH CRC: ' num2str(sib1CRC)]);
+disp([' PDSCH CRC: ' num2str(dataCRC)]);
 
-if sib1CRC == 0
+if dataCRC == 0
     disp(' PDSCH decoding succeeded.');
 else
     disp(' PDSCH decoding failed.');
