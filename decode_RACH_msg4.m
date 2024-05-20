@@ -1,5 +1,5 @@
 sampleRate = 23.04e6;
-fPhaseComp = 0;
+fPhaseComp = 2114450000;
 refBurst.BlockPattern = 'Case A';
 refBurst.L_max = 4;
 minChannelBW = 5;
