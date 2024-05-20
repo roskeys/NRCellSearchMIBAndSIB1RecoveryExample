@@ -4,7 +4,7 @@ refBurst.BlockPattern = 'Case A';
 refBurst.L_max = 4;
 minChannelBW = 5;
 
-samples_file = "/home/roskey/Documents/MATLAB/NRCellSearchMIBAndSIB1RecoveryExample/records/srsran_band1_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn.fc32";
+samples_file = "records/srsran_band1_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn.fc32";
 fid = fopen(samples_file, 'rb');
 if fid == -1
     fprintf("Failed to open file!\n"); 
@@ -536,7 +536,6 @@ freqSearch = -bw/2:freqStep:bw/2-freqStep;
 freqSearch = freqSearch(fSearchIdx);
 
 for fpc = fPhaseComp + 1e3*freqSearch
-    
     % OFDM demodulate received waveform
     nSlot = 0;
     rxGrid = nrOFDMDemodulate(rxWaveform, nrb, scsCommon, nSlot,...

@@ -4,7 +4,7 @@ refBurst.BlockPattern = 'Case A';
 refBurst.L_max = 4;
 minChannelBW = 5;
 
-samples_file = "/home/roskey/Documents/MATLAB/NRCellSearchMIBAndSIB1RecoveryExample/records/srsran_band1_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn.fc32";
+samples_file = "records/srsran_band1_423400_10MHz_15KHz/srsran_band1_10MHz_15KHz_dl_conn.fc32";
 fid = fopen(samples_file, 'rb');
 if fid == -1
     fprintf("Failed to open file!\n"); 
@@ -490,6 +490,8 @@ disp([' PDCCH CRC: ' num2str(dciCRC)]);
 
 % Build DCI message structure
 dci = fromBits(dci,dcibits);
+% disp(dci);
+
 
 % Get PDSCH configuration from cell ID, BCH information, and DCI
 [pdsch,K0] = hSIB1PDSCHConfiguration(dci,pdcch.NSizeBWP,initialSystemInfo.DMRSTypeAPosition,csetPattern);
